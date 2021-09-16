@@ -6,22 +6,14 @@ const
   headerInput = document.querySelector('.header-input'),
   todoList = document.querySelector('.todo-list'),
   todoCompleted = document.querySelector('.todo-completed');
-  todoRemove = document.querySelector('.todo-remove');
-
-  let todoData = [];
-  let getStorege = function(){
-    let data = JSON.parse(localStorage.getItem('todo'));
-    if (data) {
-      todoData = data;
-    }
-  };
-
+  todoData = JSON.parse(localStorage.getItem('todoList')) || [];
+ 
   const render = function(){
     todoList.textContent = '';
     todoCompleted.textContent = '';
 
 
-    todoData.forEach(function(item){
+    todoData.forEach(function(item, i){
      const li = document.createElement('li');
      li.classList.add('todo-item');
      li.innerHTML = '<span class="text-todo">' + item.value +'</span>' +
@@ -37,35 +29,42 @@ const
      }
 
      const todoComplete = li.querySelector('.todo-complete');
+
      todoComplete.addEventListener('click', function(){
         item.completed = !item.completed;
+        localStorage.setItem('todoList', JSON.stringify(todoData));
         render();
      });
 
-     todoRemove.addEventListener('click', function(){
-      item.splice(i);
+     const btntodoRemove = li.querySelector('.todo-remove');
+
+     btntodoRemove.addEventListener('click', function(){
+      todoData.splice(i, 1);
+      localStorage.setItem('todoList', JSON.stringify(todoData));
       render();
-    });    
+   });
+
     });
 
   };
+
     todoControl.addEventListener('submit', function(event){
     event.preventDefault();
-    const newTodo = {
-      value: headerInput.value,
-      completed: false
-    };
-
-    if (headerInput.value !== '' || headerInput.value !== ' '){
-      headerInput.value.trim();
-    }
-    else {
-      console.log('Ошибка');
-    }
-    localStorage.todoData = JSON.stringify(todoData);
-    render();  
     
-   
+    if (headerInput.value.trim() !== ''){
+      const newTodo = {
+        value: headerInput.value,
+        completed: false
+      };
+    
+      headerInput.value = '';
+      todoData.push(newTodo);
+      localStorage.setItem('todoList', JSON.stringify(todoData));
+      render ();
+    } 
+    else {
+      headerInput.value = '';
+    }  
   });
 
   render();
